@@ -5,9 +5,6 @@
   "authors": [
     "Karl Johan Krantz <schwomp@gmail.com>"
   ],
-  "moduleType": [
-    "amd"
-  ],
   "license": "MIT",
   "ignore": [
     "**/.*",
@@ -20,5 +17,6 @@
     "requirejs": "~2.1.14",
     "three.js": "*",
     "jquery": "~2.1.1"
-  }
+  },
+  "private": true
 }
