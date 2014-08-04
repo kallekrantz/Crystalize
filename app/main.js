@@ -2,7 +2,8 @@ require.config({
     paths: {
         text: '../node_modules/text/text',
         jQuery: '../bower_components/jquery/dist/jquery.min',
-        ThreeCore: '../bower_components/three.js/three'
+        ThreeCore: '../bower_components/three.js/three',
+        OrbitControls: 'orbit-controls'
     },
     shim: {
         jQuery: {
@@ -10,7 +11,8 @@ require.config({
         },
         ThreeCore: {
             exports: "THREE"
-        }
+        },
+        OrbitControls: ["ThreeCore"]
     },
     priority: []
 });
@@ -24,9 +26,11 @@ require(['jQuery',
         "text!shaders/renderingFragment.glsl",
         "text!shaders/renderingVertex.glsl",
         "text!shaders/simplex-noise-3d.glsl",
-        "text!shaders/simplex-noise-4d.glsl"], function (jQuery, THREE, FragmentShader, VertexShader, renderingFragment, renderingVertex, noiseA, noiseB) {
-    var WIDTH = 800,
-        HEIGHT = 600;
+        "text!shaders/simplex-noise-4d.glsl",
+        'OrbitControls'
+        ], function (jQuery, THREE, FragmentShader, VertexShader, renderingFragment, renderingVertex, noiseA, noiseB) {
+    var WIDTH = window.innerWidth,
+        HEIGHT = window.innerHeight;
 
     var noise = noiseA;
 
@@ -69,6 +73,8 @@ require(['jQuery',
     // add the camera to the scene
     scene.add(camera);
 
+    var controls = new THREE.OrbitControls(camera);
+
     // the camera starts at 0,0,0
     // so pull it back
     camera.position.z = 300;
@@ -87,6 +93,11 @@ require(['jQuery',
     var sphereMaterial =
         new THREE.MeshLambertMaterial({
             color: 0xCC0000
+        });
+
+    var groundMaterial = 
+        new THREE.MeshLambertMaterial({
+            color: 0x00CCCC
         });
 
     var glassMaterial =
@@ -121,6 +132,14 @@ require(['jQuery',
             sphereMaterial
     );
 
+    var ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(
+            1000,
+            1000),
+            groundMaterial
+    );
+    ground.material.side = THREE.DoubleSide;
+
     var glass = new THREE.Mesh(
         new THREE.PlaneGeometry(
             90,
@@ -130,15 +149,18 @@ require(['jQuery',
     
     var renderingMesh = new THREE.Mesh(
         new THREE.PlaneGeometry(
-            1000,
-            1000),
+            WIDTH,
+            HEIGHT),
             renderingMaterial
-        );
+    );
     renderingMesh.position.z = 2;
     renderingScene.add(renderingMesh);
 
-    glass.position.z = 50;;
+    glass.position.z = 50;
+    ground.position.y = -50;
+    ground.rotation.x = Math.PI/2;
     scene.add(sphere);
+    scene.add(ground);
     
     glassScene.add(glass);
 
@@ -157,6 +179,8 @@ require(['jQuery',
     sphere.position.z = -100;
 
     (function render(time){
+        requestAnimationFrame(render);
+
         sphere.position.x = 100*Math.sin(time/3000);
         //sphere.position.y = 50*Math.cos(time/30);
 
@@ -167,8 +191,7 @@ require(['jQuery',
         renderer.render(glassScene, camera, glassTarget, true);
 
         renderer.render(renderingScene, camera);
-
-        requestAnimationFrame(render);
+        controls.update();
     })();
     'use strict'; 
 });

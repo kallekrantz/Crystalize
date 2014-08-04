@@ -1,0 +1,31 @@
+{
+  "name": "Crystalize",
+  "version": "0.0.0",
+  "description": "Crystalize ==========",
+  "main": "server.js",
+  "dependencies": {
+    "bower": "^1.3.8",
+    "grunt": "^0.4.5",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "phantomjs": "^1.9.7-15",
+    "karma": "^0.12.19",
+    "karma-jasmine": "^0.1.5",
+    "text": "git://github.com/requirejs/text",
+    "requirejs": "^2.1.14"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kallekrantz/Crystalize.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kallekrantz/Crystalize/issues"
+  },
+  "homepage": "https://github.com/kallekrantz/Crystalize"
+}
