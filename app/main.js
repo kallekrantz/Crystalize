@@ -3,7 +3,8 @@ require.config({
         text: '../node_modules/text/text',
         jQuery: '../bower_components/jquery/dist/jquery.min',
         ThreeCore: '../bower_components/three.js/three',
-        OrbitControls: 'orbit-controls'
+        OrbitControls: 'orbit-controls',
+        'dat.gui': 'dat-gui'
     },
     shim: {
         jQuery: {
@@ -12,7 +13,10 @@ require.config({
         ThreeCore: {
             exports: "THREE"
         },
-        OrbitControls: ["ThreeCore"]
+        OrbitControls: ["ThreeCore"],
+        'dat.gui': {
+            exports: "dat"
+        }
     },
     priority: []
 });
@@ -21,6 +25,7 @@ window.name = 'NG_DEFER_BOOTSTRAP!';
 
 require(['jQuery', 
         'ThreeCore', 
+        'dat.gui',
         "text!shaders/fragmentShader.glsl", 
         "text!shaders/vertexShader.glsl",
         "text!shaders/renderingFragment.glsl",
@@ -28,7 +33,7 @@ require(['jQuery',
         "text!shaders/simplex-noise-3d.glsl",
         "text!shaders/simplex-noise-4d.glsl",
         'OrbitControls'
-        ], function (jQuery, THREE, FragmentShader, VertexShader, renderingFragment, renderingVertex, noiseA, noiseB) {
+        ], function (jQuery, THREE, dat, FragmentShader, VertexShader, renderingFragment, renderingVertex, noiseA, noiseB) {
     var WIDTH = window.innerWidth,
         HEIGHT = window.innerHeight;
 
@@ -42,6 +47,18 @@ require(['jQuery',
     // get the DOM element to attach to
     // - assume we've got jQuery to hand
     var element = jQuery('#container');
+
+    var guiSettings = {
+        opacity: 0.001,
+        frequency: 0.001,
+        mixFactor: 0.000000001
+    }
+    var gui = new dat.GUI();
+    
+    gui.add(guiSettings, 'opacity', 0.0, 1.0);
+    gui.add(guiSettings, 'frequency', 0.0, 1.0);
+    gui.add(guiSettings, 'mixFactor', 0.0, 1.0);
+
 
     // create a WebGL renderer, camera
     // and a scene
@@ -103,12 +120,16 @@ require(['jQuery',
     var glassMaterial =
         new THREE.ShaderMaterial({
             uniforms: {
-                scene: {type: "t", value: renderTarget}
+                scene: {type: "t", value: renderTarget},
+                opacity: {type: "f", value: guiSettings.opacity},
+                frequency: {type: "f", value: guiSettings.frequency},
+                mixFactor: {type: "f", value: guiSettings.mixFactor}
             },
             vertexShader: noise + VertexShader,
             fragmentShader: noise + FragmentShader,
             transparent: true
         });
+
 
     var renderingMaterial = 
         new THREE.ShaderMaterial({
@@ -176,12 +197,18 @@ require(['jQuery',
 
     // add to the scene
     scene.add(pointLight);
-    sphere.position.z = -100;
 
+    sphere.position.z = -100;
+    console.log(glassMaterial);
     (function render(time){
         requestAnimationFrame(render);
 
         sphere.position.x = 100*Math.sin(time/3000);
+
+        glassMaterial.uniforms.opacity.value = guiSettings.opacity;
+        glassMaterial.uniforms.frequency.value = guiSettings.frequency;
+        glassMaterial.uniforms.mixFactor.value = guiSettings.mixFactor;
+
         //sphere.position.y = 50*Math.cos(time/30);
 
         //Render the background scene

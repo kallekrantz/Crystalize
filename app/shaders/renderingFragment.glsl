@@ -12,6 +12,6 @@ void main() {
 
     vec4 background = texture2D(scene, screenCoordinates);
     vec4 glass = texture2D(glassScene, screenCoordinates);
-    
+
     gl_FragColor = max(glass, background);
 }
